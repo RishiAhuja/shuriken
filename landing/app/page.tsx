@@ -3,11 +3,10 @@ import Image from "next/image";
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="relative overflow-hidden">
+      <div className="relative flex min-h-screen flex-col overflow-hidden">
         <div className="hero-glow absolute inset-0" />
-        <div className="absolute inset-x-0 top-0 h-24 border-b border-border/70" />
 
-        <main className="relative">
+        <main className="relative flex-1">
           <div className="container mx-auto px-4 py-20 sm:px-6 lg:px-8">
             <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
               <div className="relative h-32 w-32 sm:h-40 sm:w-40">
@@ -26,7 +25,7 @@ export default function Home() {
               </h1>
               <p className="mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
                 A sharp, production-ready Next.js starter. Minimal auth, Prisma
-                database, and a clean, modern UI - without bloat.
+                database, and a clean, modern UI without bloat.
               </p>
 
               <div className="mt-10">
@@ -42,13 +41,13 @@ export default function Home() {
             </div>
           </div>
         </main>
-      </div>
 
-      <footer className="border-t border-border/70 py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          Built with Next.js 16, React 19, and TypeScript
-        </div>
-      </footer>
+        <footer className="border-t border-border/70 py-8">
+          <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+            Built with Next.js 16, React 19, and TypeScript
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }

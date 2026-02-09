@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Orbitron, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { SwrProvider } from "@/lib/swr/provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const shurikenDisplay = Orbitron({
+  variable: "--font-shuriken-display",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const shurikenBody = Space_Grotesk({
+  variable: "--font-shuriken-body",
   subsets: ["latin"],
 });
 
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${shurikenDisplay.variable} ${shurikenBody.variable} antialiased`}
       >
         <SwrProvider>
           <Navbar />

@@ -1,350 +1,114 @@
 # Shuriken
 
-A production-ready Next.js starter template with authentication, database, and modern tooling.
+![Shuriken logo](landing/public/logo.png)
 
-## Overview
+Shuriken is a sharp, production-ready Next.js starter for teams that want a clean base without unnecessary opinions. It focuses on modern UI, a Prisma-backed database, and a split architecture that keeps marketing and application concerns separate.
 
-Shuriken is a minimal, professional starter template for building Next.js applications. It includes essential authentication, database setup, and a clean UI component library - without opinionated features that you might not need.
+The template is inspired by the development environment from my company, [zenbasehq/ninja](https://github.com/zenbasehq).
 
-## Architecture
+## Split Architecture
 
-Shuriken uses a **split-application architecture** with two separate Next.js applications:
+Shuriken runs two Next.js applications that deploy independently.
 
-### Port 3001: Landing Page (`/landing` directory)
-- Public-facing website
-- Marketing content and product information  
-- Static pages that can be deployed to CDN edge
-- Simple, fast, SEO-friendly
+### Landing app (port 3001)
 
-### Port 3000: Main Application (`/app` directory)
-- Protected dashboard and features
-- Authentication required
-- Full API backend
-- Database access via Prisma
+The landing app lives in the `landing/` directory. This is your public marketing site and the equivalent of `shuriken.com`. It is optimized for fast load times and clean SEO, and it can be deployed to a CDN edge with minimal runtime requirements.
 
-**Why Split Architecture?**
-- **Performance**: Deploy landing to CDN edge, app to server
-- **Scalability**: Scale each independently based on traffic
-- **Flexibility**: Update marketing without touching core app
-- **Security**: Keep sensitive application logic separate
-- **Deployment**: Use different strategies (edge vs serverless vs container)
+### Main app (port 3000)
 
-## Tech Stack
+The main app lives in the root `app/` directory. This is your product and the equivalent of `app.shuriken.com`. It contains the dashboard, protected routes, and server-side API endpoints. Database access and server-only logic live here.
 
-### Core
-- **Next.js 16** - App Router, Server Components, Turbopack
-- **TypeScript** - Strict mode for type safety
-- **React 19** - Latest React features
+This separation keeps marketing fast and simple while letting the application scale independently.
 
-### Database
-- **PostgreSQL** - Relational database
-- **Prisma ORM** - Type-safe database client
-- **shadcn/ui** - 50+ accessible components built on Radix UI primitives
-- **Tailwind CSS v4** - Utility-first CSS with custom design tokens
-- **CVA** - Class variance authority for component variants
-- **Indigo/Emerald theme** - Professional color system with semantic intent
+## Why these tools
 
-### Developer Experience
-- **Pino** - High-performance structured logging with environment-aware formatting
-- **Biome** - Fast linting and formatting (ESLint + Prettier replacement)
-### Authentication
-- **Session-based auth** - Secure cookie sessions
-- **Password hashing** - bcrypt for secure storage
-- **Zod validation** - Runtime schema validation
+Shuriken is not a grab bag of libraries. Each tool exists to solve a concrete problem with minimal overhead.
 
-### UI & Styling
-- **shadcn/ui** - 50+ components built on Radix UI
-- **Tailwind CSS v4** - Utility-first styling
-- **Indigo + Emerald theme** - Professional color system
+- Next.js provides routing, server components, and deployment flexibility in one framework.
+- TypeScript keeps the codebase strict and safe.
+- Prisma gives a type-safe ORM and predictable migrations.
+- Zod validates API inputs and environment variables early.
+- Tailwind CSS provides fast, consistent styling.
+- shadcn/ui gives a clean component system on top of Radix primitives.
+- SWR handles client-side data fetching with cache and revalidation.
+- Pino provides structured logging in development.
+- Biome replaces ESLint and Prettier with a fast formatter and linter.
+- Husky + lint-staged enforce clean commits.
+- pnpm keeps installs fast and deterministic.
+- Docker enables reproducible production builds.
+- SOPS protects secrets across environments.
+- mprocs runs the landing app, main app, and database together.
 
-### Developer Tools
-- **Biome** - Fast linting and formatting
-- **SWR** - Data fetching with caching
-- **Husky** - Git hooks for quality checks
-- **pnpm** - Fast package manager
+## Quick start
 
-### Optional Features
-- **Docker** - Production deployment
-- **SOPS** - Encrypted secrets (remove if not needed)
+### Requirements
 
-## Quick Start
+Node.js 20+, pnpm, and a Postgres database.
 
-### Prerequisites
+### Install
 
-- **Node.js** 20.x or later
-- **pnpm** 9.x or later  
-- **PostgreSQL** database
-- **age** CLI (optional, for secrets)
-
-### Installation
-
-1. **Clone and install**
-   ```bash
-   git clone <your-repository-url>
-   cd shuriken
-   pnpm install
-   ```
-
-2. **Set up environment**
-   
-   Copy `.env.example` to `.env.local`:
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Edit `.env.local` with your database URL and settings.
-   ```bash
-   pnpm secrets:edit
-   ```
-
-3. **Set up database**
-   ```bash
-   # Run migrations
-   pnpm db:migrate
-   
-   # (Optional) Seed with sample data
-   pnpm db:seed
-   ```
-
-4. **Start development**
-   
-   Start both apps concurrently:
-   ```bash
-   pnpm mprocs
-   ```
-   
-   Or start individually:
-   ```bash
-   # Main app (port 3000)
-   pnpm dev
-   
-   # Landing page (port 3001)  
-   cd landing && pnpm dev
-   ```
-
-5. **Open in browser**
-   - Landing: [http://localhost:3001](http://localhost:3001)
-   - Dashboard: [http://localhost:3000](http://localhost:3000)
-
-## Project Structure
-
-```
-shuriken/
-├── app/                          # Main app (port 3000)
-│   ├── (dashboard)/              # Protected routes  
-│   │   └── dashboard/            # Dashboard page
-│   ├── api/                      # API routes
-│   │   └── auth/                 # Auth endpoints
-│   ├── globals.css               # Global styles
-│   ├── layout.tsx                # Root layout
-│   └── page.tsx                  # Redirects to landing
-├── landing/                      # Landing app (port 3001)
-│   ├── app/                      # Landing pages
-│   ├── components/               # Landing components
-│   └── public/                   # Static assets (logo.png)
-├── components/                   # Main app components
-│   └── ui/                       # shadcn/ui components (50+)
-├── hooks/                        # Custom React hooks
-├── lib/                          # Core utilities  
-│   ├── auth/                     # Auth helpers
-│   ├── db.ts                     # Prisma client
-│   └── env.ts                    # Env validation
-├── services/                     # Business logic
-│   └── auth/                     # Auth service
-├── packages/database/            # Prisma schema
-├── infrastructure/               # Docker configs (optional)
-└── docs/                         # Documentation
+```bash
+git clone <your-repository-url>
+cd shuriken
+pnpm install
 ```
 
-## Logo Placement
+### Environment
 
-**Place your Shuriken logo at:**
-```
-landing/public/logo.png
-```
-
-The logo will appear in:
-- Landing page navbar (32x32px)
-- Landing page hero (160x160px)
-
-Recommended: PNG with transparent background, square aspect ratio.
-
-## Environment Variables
-
-Create `.env.local` with:
+Create `.env` in the repository root:
 
 ```bash
 DATABASE_URL=postgresql://user:password@localhost:5432/db
 NEXT_PUBLIC_MAIN_APP_URL=http://localhost:3000
 NEXT_PUBLIC_LANDING_URL=http://localhost:3001
-## Database
+```
 
-Minimal Prisma schema with essential models:
-- **User** - Accounts with email and password
-- **Session** - Active sessions with expiration
-- **LoginHistory** - Optional login tracking
-- **ActivityEvent** - Optional activity logging  
-- **AuditLog** - Optional audit trail
-
-### Commands
+### Database
 
 ```bash
-pnpm db:studio      # Open Prisma Studio (GUI)
-pnpm db:generate    # Generate Prisma Client
-pnpm db:migrate     # Run migrations
-pnpm db:push        # Push schema (dev only)
-pnpm db:seed        # Seed database
+pnpm db:migrate
+pnpm db:seed
 ```
 
-## UI Components
-
-Built with shadcn/ui - 50+ components with Indigo (primary) and Emerald (success) theme:
-
-- **Forms**: Input, Select, Checkbox, Radio, Switch, Textarea
-- **Overlays**: Dialog, Sheet, Popover, Dropdown Menu, Tooltip
-- **Data**: Table, Card, Badge, Avatar, Separator
-- **Navigation**: Tabs, Breadcrumb, Sidebar
-- **Feedback**: Alert, Toast, Progress, Spinner
-
-```tsx
-import { Button } from '@/components/ui/button';
-
-<Button variant="default">Primary</Button>
-<Button variant="success">Success</Button>
-<Button variant="destructive">Delete</Button>
-```
-
-**Design Principles:**
-- Hard edges (rounded-none) for modern, sharp look
-- 2px borders for strong definition
-- Indigo primary, Emerald success, Amber warning
-- No animations (fast, professional)
-
-See [components documentation](docs/design/design.md) for details.
-
-## Docker Deployment (Optional)
-
-### Development
+### Run both apps
 
 ```bash
-pnpm docker:dev              # Start
-pnpm docker:dev:down         # Stop services
+pnpm mprocs
 ```
 
-### Production
+Landing runs at [http://localhost:3001](http://localhost:3001). The main app runs at [http://localhost:3000](http://localhost:3000).
 
-```bash
-pnpm docker:prod             # Build and deploy
-pnpm docker:prod:logs        # View logs
-pnpm docker:prod:down        # Stop services
+## Project layout
+
+```
+shuriken/
+├── app/                        # Main app (port 3000)
+├── landing/                    # Landing app (port 3001)
+├── components/                 # Shared UI components
+├── hooks/                      # Shared hooks
+├── lib/                        # Core utilities
+├── services/                   # Business logic
+├── packages/database/          # Prisma schema and migrations
+└── docs/                       # Documentation
 ```
 
-Production setup includes multi-stage builds, health checks, persistent volumes, and Next.js standalone output.
+## Logo
 
-## Authentication
+Place your logo at:
 
-Custom session-based authentication with password hashing, session management, and login history tracking.
-
-```typescript
-import { requireAuth, getOptionalAuth } from '@/lib/auth/utils';
-
-// Protected API route
-export async function GET(req: Request) {
-  const { user } = await requireAuth(req);
-  // user guaranteed
-}
+```
+landing/public/logo.png
 ```
 
-## Email
+This logo appears in the landing navbar and hero section.
 
-React Email templates in `services/email/templates/`:
+## Features
 
-```tsx
-import { Button, Html, Text } from '@react-email/components';
-
-export function WelcomeEmail({ name }: { name: string }) {
-  return (
-    <Html>
-      <Text>Welcome, {name}!</Text>
-      <Button href="https://yourapp.com">Get Started</Button>
-    </Html>
-  );
-}
-```
-
-Send emails:
-
-```typescript
-import { sendEmail } from '@/services/email/email-service';
-
-await sendEmail({
-  to: 'user@example.com',
-  subject: 'Welcome!',
-  react: <WelcomeEmail name={user.name} />,
-});
-```
-
-## Data Fetching
-
-### SWR Hooks
-
-```typescript
-import { useFetch } from '@/hooks/use-fetch';
-
-function Profile() {
-  const { data, error, isLoading } = useFetch('/api/profile');
-  if (isLoading) return <Spinner />;
-  return <div>{data.name}</div>;
-}
-```
-
-### Mutations
-
-```typescript
-import { useMutation } from '@/hooks/use-mutation';
-
-const { trigger, isMutating } = useMutation('/api/profile', {
-  method: 'PUT',
-  onSuccess: () => toast.success('Updated'),
-});
-```
-
-## Code Quality
-
-```bash
-pnpm lint           # Check issues
-pnpm format         # Format files
-pnpm type-check     # TypeScript check
-```
-
-Husky runs Biome checks before every commit.
-
-## Customization
-
-### Remove Features
-
-**Authentication:** Delete `app/api/auth`, `lib/auth`, `services/auth` and related schema models
-
-**Email:** Delete `services/email`, remove `resend` and `@react-email/*` from `package.json`
-
-**Redis:** Remove from Docker Compose, delete Redis code, remove from `package.json`
-
-### Add Features
-
-- **API routes:** Add to `/app/api/`
-- **Pages:** Add to `/app/` or `/app/(dashboard)/`
-- **Business logic:** Add to `/services/`
-- **Database models:** Update `packages/database/prisma/schema.prisma`
+Prisma provides typed access to Postgres. SWR handles client data fetching and cache revalidation. The UI system is built on Tailwind CSS and shadcn/ui with a sharp, high-contrast theme.
 
 ## Deployment
 
-### Vercel
-
-1. Connect repository to Vercel
-2. Add environment variables
-3. Deploy
-
-### Docker (VPS, AWS, GCP)
+You can deploy the landing app separately from the main app. This allows `shuriken.com` to stay fast and static while `app.shuriken.com` scales for authenticated traffic. Docker configuration is provided for production environments if you want a containerized setup.
 
 ```bash
 docker build -f infrastructure/dockerfiles/Dockerfile.prod -t shuriken .
@@ -365,12 +129,11 @@ Point to `infrastructure/dockerfiles/Dockerfile.prod` and configure environment 
 
 ## Security
 
-1. SOPS encryption for secrets
-2. Zod validation for all inputs
-3. PII redaction in logs
-4. Secure password hashing
-5. Session expiration
-6. CORS configuration
+- SOPS encryption for secrets
+- Zod validation for all inputs
+- Secure password hashing
+- Session expiration
+- CORS configuration
 
 ## Troubleshooting
 
@@ -406,7 +169,9 @@ pnpm secrets:decrypt
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE) for details.
+
+Copyright (c) 2026 Rishi Ahuja
 
 ## Support
 
