@@ -2,7 +2,7 @@
 
 ![Shuriken logo](landing/public/logo.png)
 
-Shuriken is a sharp, production-ready Next.js starter for teams that want a clean base without unnecessary opinions. It focuses on modern UI, a Prisma-backed database, and a split architecture that keeps marketing and application concerns separate.
+Shuriken is a sharp, production-ready Next.js starter for teams that want a clean, intentional foundation. It makes strong, battle-tested choices so you don’t have to.
 
 The template is inspired by the development environment from my company, [zenbasehq/ninja](https://github.com/zenbasehq).
 

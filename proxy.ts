@@ -6,11 +6,11 @@ const LANDING_APP_URL =
 const SESSION_COOKIE_NAME = "session_id";
 
 // Public routes that don't require authentication
-const PUBLIC_ROUTES = [
+const PUBLIC_ROUTES = new Set([
   "/api/auth/login",
   "/api/auth/register",
   "/api/auth/session",
-];
+]);
 
 // API routes that should be accessible without auth
 const PUBLIC_API_PREFIXES = ["/api/auth"];
@@ -19,7 +19,7 @@ export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Check if it's a public route
-  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname === route);
+  const isPublicRoute = PUBLIC_ROUTES.has(pathname);
   const isPublicApiPrefix = PUBLIC_API_PREFIXES.some((prefix) =>
     pathname.startsWith(prefix),
   );
@@ -33,9 +33,7 @@ export default async function proxy(request: NextRequest) {
 
   // If no session, redirect to landing app login with return URL
   if (!sessionId) {
-    const loginUrl = new URL("/login", LANDING_APP_URL);
-    loginUrl.searchParams.set("redirect", request.url);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL("/", LANDING_APP_URL));
   }
 
   // Verify session by calling the session API
@@ -49,10 +47,8 @@ export default async function proxy(request: NextRequest) {
 
     if (!sessionResponse.ok) {
       // Session invalid, redirect to login
-      const loginUrl = new URL("/login", LANDING_APP_URL);
-      loginUrl.searchParams.set("redirect", request.url);
-
-      const response = NextResponse.redirect(loginUrl);
+      // Session invalid, redirect to landing root
+      const response = NextResponse.redirect(new URL("/", LANDING_APP_URL));
       response.cookies.delete(SESSION_COOKIE_NAME);
       return response;
     }
@@ -66,9 +62,8 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   } catch (_error) {
     // If session check fails, redirect to login
-    const loginUrl = new URL("/login", LANDING_APP_URL);
-    loginUrl.searchParams.set("redirect", request.url);
-    return NextResponse.redirect(loginUrl);
+    // If session check fails, redirect to landing root
+    return NextResponse.redirect(new URL("/", LANDING_APP_URL));
   }
 }
 
@@ -81,6 +76,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder files
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/auth).*)",
+    String.raw`/((?!_next/static|_next/image|favicon.ico|.*\..*|api/auth).*)`,
   ],
 };
