@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="landing/public/logo.png" alt="Shuriken logo" width="250" />
+  <img src="landing/public/logo.png" alt="Shuriken logo" width="200" />
   <h1>Shuriken</h1>
 </div>
 
@@ -44,7 +44,18 @@ Shuriken is not a grab bag of libraries. Each tool exists to solve a concrete pr
 
 ### Requirements
 
-Node.js 20+, pnpm, and a Postgres database.
+- Node.js 20+
+- pnpm
+- PostgreSQL (or Docker)
+- [age](https://github.com/FiloSottile/age) and [sops](https://github.com/mozilla/sops) for secret decryption
+- [mprocs](https://github.com/pvolok/mprocs) (optional, for running all services together)
+
+```bash
+# macOS
+brew install age sops mprocs
+```
+
+See [docs/setup/secrets/sops-secret-management.md](docs/setup/secrets/sops-secret-management.md) for installation on other platforms and full SOPS setup.
 
 ### Install
 
@@ -56,13 +67,24 @@ pnpm install
 
 ### Environment
 
-Create `.env` in the repository root:
+Secrets are encrypted in `secrets/*.enc.yaml` using SOPS + age. To decrypt them into `.env`:
+
+1. Get the age secret key from your team lead and save it:
 
 ```bash
-DATABASE_URL=postgresql://user:password@localhost:5432/db
-NEXT_PUBLIC_MAIN_APP_URL=http://localhost:3000
-NEXT_PUBLIC_LANDING_URL=http://localhost:3001
+echo "AGE-SECRET-KEY-xxxxxxxxxx" > .age-key.txt
+chmod 600 .age-key.txt
 ```
+
+2. Decrypt secrets for local development:
+
+```bash
+pnpm secrets:decrypt
+```
+
+This generates `.env` from `secrets/local.enc.yaml`. See [.env.example](.env.example) for the full list of variables.
+
+> To edit secrets: `pnpm secrets:edit` opens the encrypted file in your editor, then re-encrypts on save.
 
 ### Database
 
@@ -74,38 +96,36 @@ pnpm db:seed
 ### Run both apps
 
 ```bash
-pnpm mprocs
+mprocs
 ```
 
-Landing runs at [http://localhost:3001](http://localhost:3001). The main app runs at [http://localhost:3000](http://localhost:3000).
+This starts the database (via Docker), the main app, and the landing app together. Landing runs at [http://localhost:3001](http://localhost:3001). The main app runs at [http://localhost:3000](http://localhost:3000).
+
+Alternatively, run each app individually:
+
+```bash
+pnpm dev          # Main app only
+cd landing && pnpm dev  # Landing app only
+```
 
 ## Project layout
 
 ```
 shuriken/
-├── app/                        # Main app (port 3000)
+├── app/                        # Main app routes and API (port 3000)
 ├── landing/                    # Landing app (port 3001)
-├── components/                 # Shared UI components
-├── hooks/                      # Shared hooks
-├── lib/                        # Core utilities
-├── services/                   # Business logic
+├── components/                 # Shared UI components (shadcn/ui)
+├── hooks/                      # Shared React hooks
+├── lib/                        # Core utilities (auth, db, env, logging)
+├── services/                   # Business logic (auth, email)
 ├── packages/database/          # Prisma schema and migrations
+├── secrets/                    # SOPS-encrypted environment secrets
+├── infrastructure/             # Docker and deployment configuration
+├── scripts/                    # Development scripts
 └── docs/                       # Documentation
 ```
 
-## Logo
-
-Place your logo at:
-
-```
-landing/public/logo.png
-```
-
-This logo appears in the landing navbar and hero section.
-
-## Features
-
-Prisma provides typed access to Postgres. SWR handles client data fetching and cache revalidation. The UI system is built on Tailwind CSS and shadcn/ui with a sharp, high-contrast theme.
+Place your logo at `landing/public/logo.png` to update it in the landing navbar and hero section.
 
 ## Deployment
 
@@ -126,14 +146,14 @@ Point to `infrastructure/dockerfiles/Dockerfile.prod` and configure environment 
 - Turbopack dev server
 - Server Components for reduced JavaScript
 - Prisma connection pooling
-- Redis caching
+- Redis caching (optional)
 
 ## Security
 
-- SOPS encryption for secrets
-- Zod validation for all inputs
-- Secure password hashing
-- Session expiration
+- SOPS + age encryption for secrets (no plaintext `.env` in Git)
+- Zod validation for all API inputs and environment variables
+- Secure password hashing (bcrypt)
+- Session-based authentication with expiration
 - CORS configuration
 - In-memory rate limiting on auth endpoints
 
@@ -164,11 +184,14 @@ docker system prune -a
 pnpm docker:dev
 ```
 
-**Secrets decryption:**
+**Secrets decryption failing:**
 ```bash
+# Ensure the age key file exists and SOPS can find it
 export SOPS_AGE_KEY_FILE=.age-key.txt
 pnpm secrets:decrypt
 ```
+
+See [docs/setup/secrets/sops-secret-management.md](docs/setup/secrets/sops-secret-management.md) for detailed troubleshooting.
 
 ## Contributing
 
