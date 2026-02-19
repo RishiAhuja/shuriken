@@ -127,12 +127,6 @@ export async function getCurrentUser() {
     return null;
   }
 
-  // Update last login
-  await db.user.update({
-    where: { id: user.id },
-    data: { lastLoginAt: new Date() },
-  });
-
   return user;
 }
 

@@ -1,6 +1,7 @@
-# Shuriken
-
-![Shuriken logo](landing/public/logo.png)
+<div align="center">
+  <img src="landing/public/logo.png" alt="Shuriken logo" width="120" />
+  <h1>Shuriken</h1>
+</div>
 
 Shuriken is a sharp, production-ready Next.js starter for teams that want a clean, intentional foundation. It makes strong, battle-tested choices so you don’t have to.
 
@@ -134,6 +135,15 @@ Point to `infrastructure/dockerfiles/Dockerfile.prod` and configure environment 
 - Secure password hashing
 - Session expiration
 - CORS configuration
+- In-memory rate limiting on auth endpoints
+
+### Rate limiting
+
+`lib/rate-limit.ts` implements a sliding window rate limiter applied to the login and register routes. Each client IP is tracked in a `Map` with a request count and a window expiry. Once the count exceeds the configured limit, the endpoint returns `429 Too Many Requests` with a `Retry-After` header.
+
+Default limits: **10 requests per 60 seconds** for auth routes. The store cleans up expired entries every 60 seconds to prevent unbounded memory growth.
+
+This is an in-memory implementation — it resets on process restart and does not share state across multiple instances. For multi-instance deployments, swap the store for Redis using `INCR` / `EXPIRE`.
 
 ## Troubleshooting
 

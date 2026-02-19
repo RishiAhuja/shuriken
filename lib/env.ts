@@ -57,6 +57,10 @@ const envSchema = z.object({
     .enum(["fatal", "error", "warn", "info", "debug", "trace"])
     .default("info"),
 
+  // Email (Resend)
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM_EMAIL: z.string().email().optional(),
+
   // Optional: External Services
   // Add your own service keys here as needed
   // STRIPE_SECRET_KEY: z.string().optional(),

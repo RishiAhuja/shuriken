@@ -15,7 +15,7 @@ const PUBLIC_ROUTES = new Set([
 // API routes that should be accessible without auth
 const PUBLIC_API_PREFIXES = ["/api/auth"];
 
-export default async function proxy(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Check if it's a public route
@@ -46,7 +46,6 @@ export default async function proxy(request: NextRequest) {
     });
 
     if (!sessionResponse.ok) {
-      // Session invalid, redirect to login
       // Session invalid, redirect to landing root
       const response = NextResponse.redirect(new URL("/", LANDING_APP_URL));
       response.cookies.delete(SESSION_COOKIE_NAME);
@@ -61,7 +60,6 @@ export default async function proxy(request: NextRequest) {
     // Session is valid, allow request to proceed
     return NextResponse.next();
   } catch (_error) {
-    // If session check fails, redirect to login
     // If session check fails, redirect to landing root
     return NextResponse.redirect(new URL("/", LANDING_APP_URL));
   }
@@ -76,6 +74,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder files
      */
-    String.raw`/((?!_next/static|_next/image|favicon.ico|.*\..*|api/auth).*)`,
+    "/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/auth).*)",
   ],
 };

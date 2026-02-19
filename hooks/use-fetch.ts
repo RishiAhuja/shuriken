@@ -5,6 +5,7 @@
  * Type-safe wrapper around useSWR with consistent API
  */
 
+import { useState } from "react";
 import useSWR, { type SWRConfiguration, type SWRResponse } from "swr";
 import type { ApiError } from "@/lib/api/types";
 
@@ -67,7 +68,7 @@ export function usePaginatedFetch<T>(
   options?: UsePaginatedFetchOptions<T>,
 ) {
   const { pageSize = 10, initialPage = 1, ...swrOptions } = options || {};
-  const [page, setPage] = React.useState(initialPage);
+  const [page, setPage] = useState(initialPage);
 
   const url = `${baseUrl}?page=${page}&limit=${pageSize}`;
   const result = useFetch<T>(url, swrOptions);
@@ -79,6 +80,3 @@ export function usePaginatedFetch<T>(
     pageSize,
   };
 }
-
-// Required React import for useState
-import React from "react";

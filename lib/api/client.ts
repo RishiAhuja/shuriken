@@ -6,7 +6,8 @@
 import type { ApiResponse, HttpMethod, RequestConfig } from "./types";
 import { ApiError } from "./types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_MAIN_APP_URL || "http://localhost:3000";
 
 /**
  * Build URL with query parameters

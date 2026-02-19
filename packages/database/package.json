@@ -1,8 +1,8 @@
 {
   "name": "database",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Prisma database schema, migrations, and client for Shuriken",
+  "author": "Rishi Ahuja",
   "scripts": {
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -11,7 +11,6 @@
     "db:seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {

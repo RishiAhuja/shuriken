@@ -3,6 +3,7 @@ import { ZodError } from "zod";
 import { registerSchema } from "@/lib/auth/validation";
 import { corsHeaders } from "@/lib/cors";
 import { logger } from "@/lib/logger";
+import { checkRateLimit, getClientIp, rateLimits } from "@/lib/rate-limit";
 import { registerUser } from "@/services/auth/auth-service";
 
 export async function OPTIONS() {
@@ -10,6 +11,26 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const clientIp = getClientIp(request);
+  const rateLimit = checkRateLimit(`register:${clientIp}`, rateLimits.auth);
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Too many registration attempts. Please try again later.",
+      },
+      {
+        status: 429,
+        headers: {
+          ...corsHeaders,
+          "Retry-After": String(rateLimit.retryAfterSeconds),
+        },
+      },
+    );
+  }
+
   try {
     const body = await request.json();
 

@@ -17,7 +17,6 @@ import { join } from "node:path";
 
 const SCHEMA_PATH = "packages/database/prisma/schema.prisma";
 const MIGRATIONS_DIR = "packages/database/prisma/migrations";
-const _LOCK_FILE = "packages/database/prisma/migrations/migration_lock.toml";
 
 interface CheckResult {
   schemaChanged: boolean;
@@ -34,7 +33,7 @@ function execCommand(command: string, ignoreError = false): string {
   }
 }
 
-function getLatestMigrationTime(): number | null {
+function _getLatestMigrationTime(): number | null {
   if (!existsSync(MIGRATIONS_DIR)) {
     return null;
   }
@@ -93,9 +92,6 @@ function checkSchemaChanges(mode: "pre-commit" | "ci"): CheckResult {
   // Schema has changed
   result.schemaChanged = true;
 
-  // Check for new migrations
-  const _latestMigrationBeforeChanges = getLatestMigrationTime();
-
   if (mode === "pre-commit") {
     // Check if any migration files are staged
     const stagedFiles = execCommand("git diff --cached --name-only", true);
@@ -109,10 +105,6 @@ function checkSchemaChanges(mode: "pre-commit" | "ci"): CheckResult {
   } else {
     // CI mode: Check for new migration directories
     if (existsSync(MIGRATIONS_DIR)) {
-      const _allMigrations = readdirSync(MIGRATIONS_DIR).filter((f) =>
-        f.match(/^\d{14}_/),
-      );
-
       // Get migrations from the diff
       const baseBranch = process.env.GITHUB_BASE_REF || "main";
       const newFiles = execCommand(
