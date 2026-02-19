@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="landing/public/logo.png" alt="Shuriken logo" width="120" />
+  <img src="landing/public/logo.png" alt="Shuriken logo" width="250" />
   <h1>Shuriken</h1>
 </div>
 
