@@ -49,7 +49,7 @@ Node.js 20+, pnpm, and a Postgres database.
 ### Install
 
 ```bash
-git clone <your-repository-url>
+git clone git@github.com:RishiAhuja/shuriken.git
 cd shuriken
 pnpm install
 ```
